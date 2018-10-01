@@ -1,5 +1,5 @@
 aria2:
-  image: aria2
+  image: ztyhehe/aria2
   restart: always
   privileged: True
   ports:
