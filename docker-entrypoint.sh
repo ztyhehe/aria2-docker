@@ -1,30 +1,34 @@
 #!/bin/sh
 
+cmd=
+for i; do
+    cmd="$cmd '$i'"
+done
+
+
 if [[ "${1}" == 'sh' || "${1}" == '/bin/sh' ]];then
     /bin/sh
     exit 1
-fi
+elif [[ "${1}" == 'aria2c' ]]; then
+    work_path=${WORK_PATH:-/data}
 
+    if [ ! -d ${work_path} ]; then
+        mkdir ${work_path}
+    fi
 
-work_path=${WORK_PATH:-/data}
+    downloads=${work_path}/downloads
+    if [ ! -d ${downloads} ]; then
+        mkdir ${downloads}
+    fi
 
-if [ ! -d ${work_path} ]; then
-  mkdir ${work_path}
-fi
+    session_file=${work_path}/aria2.session
+    if [ ! -f ${session_file} ]; then
+        touch ${session_file}
+    fi
 
-downloads=${work_path}/downloads
-if [ ! -d ${downloads} ]; then
-  mkdir ${downloads}
-fi
-
-session_file=${work_path}/aria2.session
-if [ ! -f ${session_file} ]; then
-  touch ${session_file}
-fi
-
-config_file=${work_path}/config.conf
-if [ ! -f ${config_file} ]; then
-  cat > ${config_file} <<__EOF
+    config_file=${work_path}/config.conf
+    if [ ! -f ${config_file} ]; then
+        cat > ${config_file} <<__EOF
 log=${work_path}/aria2.log
 log-level=notice
 console-log-level=notice
@@ -60,8 +64,14 @@ seed-ratio=0
 bt-seed-unverified=true
 bt-save-metadata=true
 __EOF
+    fi
+
+    cat ${config_file}
+
+    cmd="$cmd --conf-path ${config_file}"
+
 fi
 
-cat ${config_file}
 
-aria2c --conf-path=${config_file}
+exec /bin/sh -c "$cmd"
+
