@@ -1,0 +1,10 @@
+aria2:
+  image: aria2
+  restart: always
+  privileged: True
+  ports:
+    - "6800:6800"
+    - "51413:51413"
+    - "6881-6999:6881-6999"
+  volumes:
+    - /root/aria2/data:/data
